@@ -6,6 +6,12 @@
 [Bb]uilds/
 Assets/AssetStoreTools*
 
+# Unity logs
+Logs/
+
+# User settings
+UserSettings/
+
 # Visual Studio
 *.user
 *.userprefs
