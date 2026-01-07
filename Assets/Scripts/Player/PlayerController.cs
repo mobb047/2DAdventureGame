@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,9 +7,11 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour
 {
     public PlayerInputControl inputControl;
-    public Rigidbody2D rb;
+    public Rigidbody2D rb;//这个rb是刚体
     public Vector2 inputDirection;
+    [Header("基本参数")]
     public float speed;
+    public float jumpForce;
 
     //一些生命周期函数，我也不太清楚叫啥。awake是最先的对象创建时候，每个对象只执行一次，
     //start是第二个的,在创建对象时候，每个对象只执行一次，
@@ -20,8 +23,15 @@ public class PlayerController : MonoBehaviour
     // lateupdate是每帧最后调用的
     private void Awake()
     {
+        rb = GetComponent<Rigidbody2D>();
         inputControl = new PlayerInputControl();
+        inputControl.GamePlay.Jump.started += Jump;
+        //按住用perform，按一下用started,
+        // +=表示添加事件/注册,jump添加到按下的那一刻，也意味着这一刻可以添加多个函数
+
     }
+
+  
     private void OnEnable()
     {
         inputControl.Enable();
@@ -57,7 +67,13 @@ public class PlayerController : MonoBehaviour
         transform.localScale = new Vector3(faceDir, 1, 1);//y and z are the same=1，
         // 什么时候可以确定使用localscale的方法呢？人物图片锚点的位置决定人物的反转方向，锚点在人物中间才可以用。
         // 另外，当scale默认是1，1，1时候，如果手动改变了人物的比例比如改为2，代码中的1就要改为2，faceDir和y,z都要变为2，
-        // 还有sprite组件，可以用sprite renderer.flipx=ture/false来翻转
+        // 还有sprite组件，可以用sprite renderer.flipx
     }
+      private void Jump(InputAction.CallbackContext context)
+    {
+        //Debug.Log("Jump");运行到这里在console会打印Jump
+        rb.AddForce(transform.up * jumpForce, ForceMode2D.Impulse);//世界坐标向上的力，impulse一个瞬时的力
+    }
+
 
 }
