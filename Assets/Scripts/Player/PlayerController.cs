@@ -8,6 +8,7 @@ public class PlayerController : MonoBehaviour
 {
     public PlayerInputControl inputControl;
     public Rigidbody2D rb;//这个rb是刚体
+    private PhysicsCheck physicsCheck;
     public Vector2 inputDirection;
     [Header("基本参数")]
     public float speed;
@@ -24,6 +25,7 @@ public class PlayerController : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        physicsCheck = GetComponent<PhysicsCheck>();
         inputControl = new PlayerInputControl();
         inputControl.GamePlay.Jump.started += Jump;
         //按住用perform，按一下用started,
@@ -72,7 +74,8 @@ public class PlayerController : MonoBehaviour
       private void Jump(InputAction.CallbackContext context)
     {
         //Debug.Log("Jump");运行到这里在console会打印Jump
-        rb.AddForce(transform.up * jumpForce, ForceMode2D.Impulse);//世界坐标向上的力，impulse一个瞬时的力
+        if(physicsCheck.isGround)//只有人物在地面上时才可以跳跃
+            rb.AddForce(transform.up * jumpForce, ForceMode2D.Impulse);//世界坐标向上的力，impulse一个瞬时的力
     }
 
 
