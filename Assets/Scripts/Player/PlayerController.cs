@@ -8,11 +8,13 @@ public class PlayerController : MonoBehaviour
 {
     public PlayerInputControl inputControl;
     public Rigidbody2D rb;//这个rb是刚体
+    private CapsuleCollider2D coll;
     private PhysicsCheck physicsCheck;
     public Vector2 inputDirection;
     [Header("基本参数")]
     public float speed;
     public float jumpForce;
+
 
     //一些生命周期函数，我也不太清楚叫啥。awake是最先的对象创建时候，每个对象只执行一次，
     //start是第二个的,在创建对象时候，每个对象只执行一次，
