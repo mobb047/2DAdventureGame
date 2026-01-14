@@ -68,6 +68,7 @@
     <Compile Include="Assets\Scripts\General\Attack.cs" />
     <Compile Include="Assets\Scripts\Player\PlayerController.cs" />
     <Compile Include="Assets\Scripts\General\Character.cs" />
+    <Compile Include="Assets\Scripts\Player\HurtAnimation.cs" />
     <Compile Include="Assets\Settings\InputSystem\PlayerInputControl.cs" />
     <Compile Include="Assets\Scripts\Player\PlayerAnimation.cs" />
   </ItemGroup>

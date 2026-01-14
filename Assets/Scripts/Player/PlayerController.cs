@@ -15,6 +15,12 @@ public class PlayerController : MonoBehaviour
     public float speed;
     public float jumpForce;
 
+    [Header("伤害参数")]
+    public float hurtForce;
+    public bool isHurt;
+
+    public bool isDead;
+
 
     //一些生命周期函数，我也不太清楚叫啥。awake是最先的对象创建时候，每个对象只执行一次，
     //start是第二个的,在创建对象时候，每个对象只执行一次，
@@ -50,7 +56,8 @@ public class PlayerController : MonoBehaviour
     }
     private void FixedUpdate()//物理移动，键盘wasd移动
     {
-        Move();
+        if(!isHurt)
+            Move();//如果人物没有在受伤害的状态则可以移动，受伤时不可移动
     }
 
     public void Move()
@@ -78,6 +85,21 @@ public class PlayerController : MonoBehaviour
         //Debug.Log("Jump");运行到这里在console会打印Jump
         if(physicsCheck.isGround)//只有人物在地面上时才可以跳跃
             rb.AddForce(transform.up * jumpForce, ForceMode2D.Impulse);//世界坐标向上的力，impulse一个瞬时的力
+    }
+
+    public void GetHurt(Transform attacker)
+    {
+        isHurt = true;//伤害状态
+        rb.velocity = Vector2.zero;
+        Vector2 dir = new Vector2((transform.position.x - attacker.position.x), 0).normalized;//计算一个从攻击者指向自己的方向向量，并归一化
+
+        rb.AddForce(dir * hurtForce, ForceMode2D.Impulse);//添加一个瞬时的力，把人物反弹了
+    }
+
+    public void PlayerDead()
+    {
+        isDead = true;
+        inputControl.GamePlay.Disable();
     }
 
 

@@ -10,11 +10,14 @@ public class PlayerAnimation : MonoBehaviour
    private Rigidbody2D rb;
    private PhysicsCheck physicsCheck;
 
+   private PlayerController playerController;
+
    private void Awake()
    {
        anim = GetComponent<Animator>();//通过anim访问Animator中变量的内容
        rb = GetComponent<Rigidbody2D>();
        physicsCheck = GetComponent<PhysicsCheck>();
+       playerController = GetComponent<PlayerController>();
    }
 
     public void Update()
@@ -27,6 +30,12 @@ public class PlayerAnimation : MonoBehaviour
         anim.SetFloat("velocityY", rb.velocity.y);
         anim.SetFloat("velocityX", Mathf.Abs(rb.velocity.x));//取绝对值，因为右跑是正值，左跑是负数，而我们在idle切换run的条件里给的condition是大于0.1
         anim.SetBool("isGround", physicsCheck.isGround);
+        anim.SetBool("isDead", playerController.isDead);
+    }
+
+    public void PlayHurt()
+    {
+        anim.SetTrigger("hurt");
     }
 
 }

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Events;//Unity事件
 
 public class Character : MonoBehaviour
 {
@@ -14,6 +15,8 @@ public class Character : MonoBehaviour
     private float invulnerableCounter;
     public bool invulnerable;
 
+    public UnityEvent<Transform> OnTakeDamage;//受伤事件方法，参数是攻击者位置
+    public UnityEvent OnDie;
     private void Start()
     {
         currentHealth = maxHealth;//每次新开始游戏当前血量都是满的
@@ -36,13 +39,18 @@ public class Character : MonoBehaviour
         {
             return;
         }//执行到这里结束这个函数，剩余的伤害被return掉了
-        if(currentHealth - attacker.damage > 0){
-        currentHealth -= attacker.damage;
-        TriggerInvulnerable();//触发一次伤害就执行一次伤害无敌，这样触碰的时候只有一次伤害
+        if(currentHealth - attacker.damage > 0)
+        {
+            currentHealth -= attacker.damage;
+            TriggerInvulnerable();//触发一次伤害就执行一次伤害无敌，这样触碰的时候只有一次伤害
+            //执行受伤
+            OnTakeDamage?.Invoke(attacker.transform);
+
         }
         else
         {
             currentHealth = 0;
+            OnDie?.Invoke();//invoke是触发方法
             //Die();
         }
     }
