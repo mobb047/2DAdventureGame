@@ -31,11 +31,17 @@ public class PlayerAnimation : MonoBehaviour
         anim.SetFloat("velocityX", Mathf.Abs(rb.velocity.x));//取绝对值，因为右跑是正值，左跑是负数，而我们在idle切换run的条件里给的condition是大于0.1
         anim.SetBool("isGround", physicsCheck.isGround);
         anim.SetBool("isDead", playerController.isDead);
+        anim.SetBool("isAttack", playerController.isAttack);
     }
 
     public void PlayHurt()
     {
         anim.SetTrigger("hurt");
+    }
+
+    public void PlayAttack()
+    {
+        anim.SetTrigger("attack");
     }
 
 }

@@ -10,16 +10,20 @@ public class PlayerController : MonoBehaviour
     public Rigidbody2D rb;//这个rb是刚体
     private CapsuleCollider2D coll;
     private PhysicsCheck physicsCheck;
+    public PlayerAnimation playerAnimation;
     public Vector2 inputDirection;
     [Header("基本参数")]
     public float speed;
     public float jumpForce;
 
-    [Header("伤害参数")]
     public float hurtForce;
+
+    [Header("状态")]
+    
     public bool isHurt;
 
     public bool isDead;
+    public bool isAttack;
 
 
     //一些生命周期函数，我也不太清楚叫啥。awake是最先的对象创建时候，每个对象只执行一次，
@@ -34,14 +38,22 @@ public class PlayerController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         physicsCheck = GetComponent<PhysicsCheck>();
+        //coll = GetComponent<CapsuleCollider2D>();
+        playerAnimation = GetComponent<PlayerAnimation>();
+
         inputControl = new PlayerInputControl();
+        //跳跃
         inputControl.GamePlay.Jump.started += Jump;
         //按住用perform，按一下用started,
         // +=表示添加事件/注册,jump添加到按下的那一刻，也意味着这一刻可以添加多个函数
 
+        //攻击
+        inputControl.GamePlay.Attack.started +=PlayerAttack;
+
     }
 
-  
+    
+
     private void OnEnable()
     {
         inputControl.Enable();
@@ -87,6 +99,14 @@ public class PlayerController : MonoBehaviour
             rb.AddForce(transform.up * jumpForce, ForceMode2D.Impulse);//世界坐标向上的力，impulse一个瞬时的力
     }
 
+    private void PlayerAttack(InputAction.CallbackContext obj)
+    {
+       playerAnimation.PlayAttack();
+       isAttack = true;
+    }
+
+    #region UnityEvent
+    //标注
     public void GetHurt(Transform attacker)
     {
         isHurt = true;//伤害状态
@@ -101,6 +121,7 @@ public class PlayerController : MonoBehaviour
         isDead = true;
         inputControl.GamePlay.Disable();
     }
+    #endregion
 
 
 }
