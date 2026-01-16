@@ -17,6 +17,10 @@ public class PlayerController : MonoBehaviour
     public float jumpForce;
 
     public float hurtForce;
+    [Header("物理材质")]
+    public PhysicsMaterial2D normal;
+    public PhysicsMaterial2D wall;
+
 
     [Header("状态")]
     
@@ -38,7 +42,7 @@ public class PlayerController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         physicsCheck = GetComponent<PhysicsCheck>();
-        //coll = GetComponent<CapsuleCollider2D>();
+        coll = GetComponent<CapsuleCollider2D>();
         playerAnimation = GetComponent<PlayerAnimation>();
 
         inputControl = new PlayerInputControl();
@@ -65,10 +69,11 @@ public class PlayerController : MonoBehaviour
     private void Update()//输入处理
     {
         inputDirection = inputControl.GamePlay.Move.ReadValue<Vector2>();
+        CheckState();
     }
     private void FixedUpdate()//物理移动，键盘wasd移动
     {
-        if(!isHurt)
+        if(!isHurt  && !isAttack)
             Move();//如果人物没有在受伤害的状态则可以移动，受伤时不可移动
     }
 
@@ -122,6 +127,12 @@ public class PlayerController : MonoBehaviour
         inputControl.GamePlay.Disable();
     }
     #endregion
+
+    private void CheckState()
+    {
+
+        coll.sharedMaterial = physicsCheck.isGround ? normal : wall;
+    }
 
 
 }
