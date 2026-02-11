@@ -2,12 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Boar : Enemy
+public class Boar : Enemy//父类继承
 {
-    override public void Move()
+   protected override void Awake()
     {
-        base.Move();//表示虽然重写，但是依然调用会父类的函数
-        anim.SetBool("walk", true);
+        base.Awake();//基本的awake都执行了,在这个基础上再添加一些新的东西
+        patrolState = new BoarPatrolState();//new了一个野猪巡逻，后面可以new蜜蜂等等其他的敌人
+        
     }
-    
 }

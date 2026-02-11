@@ -5,15 +5,15 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
-    Rigidbody2D rb;
-    protected Animator anim;//protected表示只有子类可以访问父类的这个变量，且外部不可用
+    public Rigidbody2D rb;
+    [HideInInspector]public Animator anim;//protected表示只有子类可以访问父类的这个变量，且外部不可用,后面因为有限状态机所以改成public了
 
-    PhysicsCheck physicsCheck;
+    [HideInInspector]public PhysicsCheck physicsCheck;//[HideInInspector]前缀可以隐藏这个参数不在unity中显示
 
    [Header("基本参数")]
    public float normalSpeed;
    public float fastSpeed;  
-    public float currentSpeed;
+   [HideInInspector] public float currentSpeed;
    public Vector3 faceDir;
    public float hurtForce;
 
@@ -27,8 +27,11 @@ public class Enemy : MonoBehaviour
    [Header("状态")]
    public bool isHurt;
    public bool isDead;
+   protected BaseState patrolState;//巡逻状态
+   protected BaseState chaseState;//追逐状态
+   protected BaseState currentState;//当前状态
 
-   private void Awake()
+   protected virtual void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
@@ -36,32 +39,78 @@ public class Enemy : MonoBehaviour
         currentSpeed = normalSpeed;    
         
     }
+    private void OnEnable()
+    {
+        
+        currentState = patrolState;
+        currentState.OnEnter(this);
+    }
 
     private void Update()
     {
         faceDir = new Vector3(-transform.localScale.x, 0, 0);
 
-        if((physicsCheck.touchLeftWall && faceDir.x < 0) || (physicsCheck.touchRightWall && faceDir.x > 0))
-        {
-            wait = true;
-            anim.SetBool("walk", false);
-            
-        }
-
+        currentState.LogicUpdate();
         TimeCounter();
         
     }
 
+  
     private void FixedUpdate()
     {
-        if(!isHurt & !isDead)//不是受伤也不是死亡就可以移动了
+        if(!isHurt && !isDead && !wait){//不是受伤也不是死亡就可以移动了
             Move();
+        }
+        currentState.PhysicsUpdate();
+    }
+      
+    //上面是原有的，下面的fixed是ai改的
+  /* 
+    private void FixedUpdate()
+{
+    if(!isHurt && !isDead && !wait && physicsCheck.isGround)
+    {
+        Move();
+    }
+    else
+    {
+        // 停止时也更新动画参数
+        rb.velocity = new Vector2(0, rb.velocity.y);
+        anim.SetFloat("speed", 0);
+    }
+    
+    currentState.PhysicsUpdate();
+}
+  */
+//fixed改到这里上面
+
+    private void OnDisable()
+    {
+        currentState.OnExit();
     }
 
     public virtual void Move()//vitual修饰符,表示子类可以重写父类的函数
     {
+        if(wait){
+            rb.velocity = new Vector2(0, rb.velocity.y); // 完全停止水平移动
+            return;}//如果在等待就不移动了
         rb.velocity = new Vector2(currentSpeed*faceDir.x*Time.deltaTime, rb.velocity.y);
     }
+
+//上面是原来的move，下面是ai改的，到summary
+/*
+public virtual void Move()
+{
+    rb.velocity = new Vector2(currentSpeed*faceDir.x*Time.deltaTime, rb.velocity.y);
+    
+    // 控制动画播放
+    float speed = Mathf.Abs(rb.velocity.x);
+    anim.SetFloat("speed", speed);
+    
+    // 调试信息
+    Debug.Log($"Speed: {speed}, Velocity X: {rb.velocity.x}");
+}
+*/
 
     /// <summary>
     /// 计时器
