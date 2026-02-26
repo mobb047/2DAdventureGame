@@ -12,17 +12,25 @@ public class Enemy : MonoBehaviour
 
    [Header("基本参数")]
    public float normalSpeed;
-   public float fastSpeed;  
+   public float chaseSpeed;  
    [HideInInspector] public float currentSpeed;
    public Vector3 faceDir;
    public float hurtForce;
 
    public Transform attacker;
 
+   [Header("检测参数")]
+   public Vector2 centerOffset;
+   public Vector2 checkSize;
+   public float checkDistance;
+   public LayerMask attackLayer;
+
    [Header("计时器")]
    public float waitTime;
    public float waitTimeCounter;
    public bool wait;
+   public float lostTime;
+   public float lostTimeCounter;
 
    [Header("状态")]
    public bool isHurt;
@@ -127,7 +135,39 @@ public void TimeCounter()
                 transform.localScale = new Vector3(faceDir.x, 1, 1);
             }
         }
+
+        if (!FoundPlayer()&&lostTimeCounter > 0)
+        {
+            lostTimeCounter -= Time.deltaTime;
+        }
+        else
+        {
+            lostTimeCounter = lostTime;
+        }
     }
+
+    public bool FoundPlayer()
+    {
+        return Physics2D.BoxCast(transform.position+(Vector3)centerOffset, checkSize,0,faceDir,checkDistance,attackLayer);
+    }//发射一个方形的判断器，检测player的图层
+
+    public void SwitchState(NPCState state)//语法塘
+    {
+        var newState = state switch 
+            {
+                NPCState.Patrol => patrolState,
+                NPCState.Chase => chaseState,
+                _ => null
+
+            };
+            currentState.OnExit();//执行上一个状态的退出
+            currentState = newState;//切换状态
+            newState.OnEnter(this);//执行新状态的进入
+
+    }
+
+
+#region 事件执行方法
 
     public void OnTakeDamage(Transform attackTrans)
     {
@@ -142,7 +182,7 @@ public void TimeCounter()
         isHurt = true;
         anim.SetTrigger("hurt");
         Vector2 dir = new Vector2(transform.position.x - attackTrans.position.x, 0).normalized;
-
+        rb.velocity = new Vector2(0, rb.velocity.y);//先把敌人水平速度置0，保证每次受伤击退的力度一样
         StartCoroutine(OnHurt(dir));//启动携程
         
     }
@@ -166,5 +206,12 @@ public void TimeCounter()
         Destroy(this.gameObject);//销毁当前的gameObject
     }
 
+    #endregion
+
+
+private void OnDrawGizmosSelected()//选中物体时显示检测范围
+    {
+        Gizmos.DrawWireSphere(transform.position+(Vector3)centerOffset+new Vector3(checkDistance*-transform.localScale.x,0), 0.2f);
+    }
 
 }
