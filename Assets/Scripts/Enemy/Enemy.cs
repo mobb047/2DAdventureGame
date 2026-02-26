@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody2D),typeof(Animator),typeof(PhysicsCheck))]//要求这个物体必须有这三个组件
 public class Enemy : MonoBehaviour
 {
     public Rigidbody2D rb;
@@ -66,10 +67,12 @@ public class Enemy : MonoBehaviour
   
     private void FixedUpdate()
     {
+        currentState.PhysicsUpdate();
+
         if(!isHurt && !isDead && !wait){//不是受伤也不是死亡就可以移动了
             Move();
         }
-        currentState.PhysicsUpdate();
+
     }
       
     //上面是原有的，下面的fixed是ai改的
@@ -99,11 +102,13 @@ public class Enemy : MonoBehaviour
 
     public virtual void Move()//vitual修饰符,表示子类可以重写父类的函数
     {
+        
         if(wait){
             rb.velocity = new Vector2(0, rb.velocity.y); // 完全停止水平移动
             return;}//如果在等待就不移动了
+        if(!anim.GetCurrentAnimatorStateInfo(0).IsName("snailPreMove"))
         rb.velocity = new Vector2(currentSpeed*faceDir.x*Time.deltaTime, rb.velocity.y);
-    }
+    }  
 
 //上面是原来的move，下面是ai改的，到summary
 /*
@@ -140,7 +145,7 @@ public void TimeCounter()
         {
             lostTimeCounter -= Time.deltaTime;
         }
-        else
+        else if (FoundPlayer())
         {
             lostTimeCounter = lostTime;
         }
