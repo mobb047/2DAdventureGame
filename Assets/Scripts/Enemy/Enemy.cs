@@ -39,6 +39,7 @@ public class Enemy : MonoBehaviour
    protected BaseState patrolState;//巡逻状态
    protected BaseState chaseState;//追逐状态
    protected BaseState currentState;//当前状态
+   protected BaseState skillState;//技能状态
 
    protected virtual void Awake()
     {
@@ -106,8 +107,8 @@ public class Enemy : MonoBehaviour
         if(wait){
             rb.velocity = new Vector2(0, rb.velocity.y); // 完全停止水平移动
             return;}//如果在等待就不移动了
-        if(!anim.GetCurrentAnimatorStateInfo(0).IsName("snailPreMove"))
-        rb.velocity = new Vector2(currentSpeed*faceDir.x*Time.deltaTime, rb.velocity.y);
+        if(!anim.GetCurrentAnimatorStateInfo(0).IsName("snailPreMove") && !anim.GetCurrentAnimatorStateInfo(0).IsName("snailRecover"))
+            rb.velocity = new Vector2(currentSpeed*faceDir.x*Time.deltaTime, rb.velocity.y);
     }  
 
 //上面是原来的move，下面是ai改的，到summary
@@ -162,6 +163,7 @@ public void TimeCounter()
             {
                 NPCState.Patrol => patrolState,
                 NPCState.Chase => chaseState,
+                NPCState.Skill => skillState,
                 _ => null
 
             };

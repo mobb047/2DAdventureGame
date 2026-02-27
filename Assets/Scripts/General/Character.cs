@@ -12,7 +12,7 @@ public class Character : MonoBehaviour
 
     [Header("受伤无敌")]
     public float invulnerableDuration;
-    private float invulnerableCounter;
+    public float invulnerableCounter;
     public bool invulnerable;
 
     public UnityEvent<Transform> OnTakeDamage;//受伤事件方法，参数是攻击者位置
@@ -35,8 +35,11 @@ public class Character : MonoBehaviour
 
     public void TakeDamage(Attack attacker)
     {
+        Debug.Log($"Taking damage: {attacker.damage}, Current Health: {currentHealth}, Invulnerable: {invulnerable}");
+
         if(invulnerable)
         {
+             Debug.Log("Invulnerable, skipping damage.");
             return;
         }//执行到这里结束这个函数，剩余的伤害被return掉了
         if(currentHealth - attacker.damage > 0)
