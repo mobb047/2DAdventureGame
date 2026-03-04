@@ -19,6 +19,7 @@ public class Enemy : MonoBehaviour
    public float hurtForce;
 
    public Transform attacker;
+   public Vector3 spwanPoint;
 
    [Header("检测参数")]
    public Vector2 centerOffset;
@@ -46,7 +47,8 @@ public class Enemy : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         physicsCheck = GetComponent<PhysicsCheck>();
-        currentSpeed = normalSpeed;    
+        currentSpeed = normalSpeed;
+        spwanPoint = transform.position;//蜜蜂一开始的位置记录点 
         
     }
     private void OnEnable()
@@ -152,7 +154,7 @@ public void TimeCounter()
         }
     }
 
-    public bool FoundPlayer()
+    public virtual bool FoundPlayer()
     {
         return Physics2D.BoxCast(transform.position+(Vector3)centerOffset, checkSize,0,faceDir,checkDistance,attackLayer);
     }//发射一个方形的判断器，检测player的图层
@@ -171,6 +173,11 @@ public void TimeCounter()
             currentState = newState;//切换状态
             newState.OnEnter(this);//执行新状态的进入
 
+    }
+
+    public virtual Vector3 GetNewPoint()
+    {
+        return transform.position;
     }
 
 
@@ -216,7 +223,7 @@ public void TimeCounter()
     #endregion
 
 
-private void OnDrawGizmosSelected()//选中物体时显示检测范围
+public virtual void OnDrawGizmosSelected()//选中物体时显示检测范围
     {
         Gizmos.DrawWireSphere(transform.position+(Vector3)centerOffset+new Vector3(checkDistance*-transform.localScale.x,0), 0.2f);
     }
